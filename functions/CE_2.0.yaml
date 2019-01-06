@@ -1,0 +1,1601 @@
+openapi: 3.0.0
+info:
+  title: cooking_exchange_2.0
+  description: "User can book, pay, manage sessions via APIs\n\n# Overview\nNo\n\n# Authentication\nPlease ensure user has authorized via Firebase Authentication\n\n# API Errors Detail\n [Up-to-date Info](https://livingmenu.sharepoint.com/:x:/r/sites/livingmenuall/_layouts/15/Doc.aspx?sourcedoc=%!!(MISSING)B(MISSING)57e14fcb-0e21-491d-bdfd-ffcd9286b6b2%!!(MISSING)D(MISSING)&action=default&uid=%!!(MISSING)B(MISSING)57E14FCB-0E21-491D-BDFD-FFCD9286B6B2%!!(MISSING)D(MISSING)&ListItemId=16450&ListId=%!!(MISSING)B(MISSING)73BD1058-A6F1-4994-AC01-0C8E65810A6C%!!(MISSING)D(MISSING)&odsp=1&env=prod)  \n**200 - OK**      Everything worked as expected.  \n**400 - \\[100]**  MalformatJSON    \n*This happens while request body doesn't match JSON object*\n```\n{\n  \"Code\": \"100\",\n  \"Message\": \"The parameter is not correct JSON object format.\"\n}\n```\n**400 - \\[101]**    MissRequired  \n*This happens while request body lacks of required fields*\n```\n{\n    \"Code\": \"101\",\n    \"Required\": \"SessionId\",\n    \"Message\": \"The request was unacceptable, often due to missing a required parameter.\"\n}\n```\n**400 - \\[102]**    DataTypeError  \n*This happens while fields in request body do not match the data type*\n```\n{\n    \"Code\": \"102\",\n    \"Message\": \"Some data are in wrong type.\"\n}\n```\n**400 - \\[103]**    DataExist  \n*This happens while data already exist in firestore, usually occured at post action*\n```\n{\n    \"Code\": \"103\",\n    \"Message\": \"Your data is not allowed to execute this operation.\"\n}\n```\n**401 - \\[200]**    Unauthorized  \n*This happens while user has not yet logged in or been authorized*\n```\n{\n  \"Code\": \"200\",\n  \"Message\": \"No valid API key provided.\"\n}\n```\n**402 - \\[300]**    RequestFailed  \n*This happens oftern due to the malfunction inside server instead of client side*\n```\n{\n  \"Code\": \"300\",\n  \"Message\": \"The parameters were valid but the request failed.\"\n}\n```\n**402 - \\[301]**    FirestoreError  \n*This happens while firestore service is malfunctioning*\n```\n{\n  \"Code\": \"301\",\n  \"Message\": \"Something went wrong on Firestore service.\"\n}\n```\n**402 - \\[302]**    StripeError [MoreInfo](https://stripe.com/docs/api/errors)  \n*This happens while stripe service is malfunctioning*\n```\n{\n  \"Code\": \"302\",\n  \"Message\": \"Card errors are the most common type of error you should expect to handle. They result when the user enters a card that can't be charged for some reason.\"\n}\n```\n**402 - \\[303]**    SwaggerError  \n*This happens while parsing Swagger file failed*\n```\n{\n  \"Code\": \"303\",\n  \"Message\": \"can't parse Swagger file correctly.\"\n}\n```\n**402 - \\[310]**    BookingStatusError  \n*This happens while user is not allowed to execute such action with current booking status*\n```\n{\n  \"Code\": \"310\",\n  \"BookingId\": \"3W552KXz4UXwMoUmxhAW\",\n  \"Status\": \"booked\",\n  \"Message\": \"Booking status is incorrect.\"\n}\n```\n**402 - \\[311]**    OrderStatusError  \n*This happens while user is not allowed to execute such action with current order status*\n```\n{\n  \"Code\": \"311\",\n  \"OrderId\": \"3W552KXz4UXwMoUmxhAW\",\n  \"Status\": \"completed\",\n  \"Message\": \"Order status is incorrect.\"\n}\n```\n**402 - \\[312]**    SessionStatusError  \n*This happens while user is not allowed to execute such action with current session status*\n```\n{\n  \"Code\": \"312\",\n  \"SessionId\": \"3W552KXz4UXwMoUmxhAW\",\n  \"Status\": \"close\",\n  \"Message\": \"Session status is incorrect.\"\n}\n```\n**402 - \\[313]**    StationStatusError\n*This happens while user is not allowed to execute such action with current station status*\n```\n{\n  \"Code\": \"313\",\n  \"StationId\": \"3W552KXz4UXwMoUmxhAW\",\n  \"Status\": \"occupied\",\n  \"Message\": \"Station status is incorrect.\"\n}\n```\n**403 - \\[403]**    NoRolePermission  \n*This happens while user is not allowed to execute such action with current user role*\n```\n{\n    \"Code\": \"403\",\n    \"Message\": \"Your role doesn't have such operation permission\"\n}\n```\n**404 - \\[404]** Not Found  \n*This happens while some fields or documents should exist but not found in firestore*\n1. Field not exist in target document  \n```\n{\n  \"Code\": \"404\",\n  \"ClassId\": \"i0C2vfPhMe6xCgGWWA5F\",\n  \"Target\": \"[EndTime] field\",\n  \"Message\": \"Some data are missing in Firestore.\"\n}\n```\n2. Document not exist for Ref  \n```\n{\n  \"Code\": \"404\",\n  \"ClassId\": \"i0C2vfPhMe6xCgGWWA5F\",\n  \"BookingId\": \"cRddOT5WVzOgQRgIgKaB\",\n  \"Target\": \"[Booking] document\",\n  \"Message\": \"Some data are missing in Firestore.\"\n}\n```\n**429 - \\[429]**    Too Many Requests  \n*This happens while too many requests sent within short period from client side*\n```\n{\n    \"Code\": \"429\",\n    \"Message\": \"Too many requests hit the API too quickly. We recommend an exponential backoff of your requests.\"\n}\n```\n**500 - \\[500]**- Server Error  \n*This happens by unknown server side error*\n```\n{\n    \"Code\": \"500\",\n    \"Message\": \"Something went wrong on server side.\"\n}\n```"
+  contact: {}
+  version: '2.0'
+servers:
+- url: https://us-central1-ce2-test-denker.cloudfunctions.net
+  variables: {}
+paths:
+  /companies:
+    post:
+      tags:
+      - Companies
+      summary: CreateCompany
+      description: "Create a company  \n\n---\n## Role\n- `admin`\n---\n## Flow\n1. **check**:\n   * no\n2. **doAction**:\n   * create_company() → create a document in *Company* collection."
+      operationId: CreateCompany
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    get:
+      tags:
+      - Companies
+      summary: GetCompany
+      description: "Get all clients.  \n\n---\n## Role\n- `any`\n---\n## Flow\n1. **check**:\n   * no\n2. **doAction**:\n   * get_corporateclients() → retrieve all documents in *CorporateClient* collection.\n---\nJira Link: [CE2-78](https://livingmenu.atlassian.net/browse/CE2-78)"
+      operationId: GetCompany
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetCompanyResponse'
+                description: ''
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /bookings:
+    post:
+      tags:
+      - Bookings
+      summary: CreateBooking
+      description: >-
+        Pay money to book the session.
+
+
+        ---
+
+        ## Role
+
+        - `any`
+
+        ---
+
+        ## FLOW
+
+        1. **check**:
+           * check_user_exists() → the user must exist in tempuser collection.
+             * error → 404, 400, NotFound
+           * check_session_open() → session must be at `open` status.
+             * error → 403, 312, SessionStatusError
+        2. **doAction**:
+           * discount() → have `fee` discount(500) if `ReferralCode` provided and valid
+           * charge() → charge user by credit card info
+             * error → 403, 301, StripeOperateError
+           * close → update session status to `close` if reaches the station/people limit
+           * create_booking() → create a document in Booking collection, having status `booked` as default
+        ---
+
+        Jira Link: [CE2-12](https://livingmenu.atlassian.net/browse/CE2-12)
+      operationId: CreateBooking
+      parameters:
+      - name: APP_AUTH
+        in: header
+        description: ''
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBookingResponse'
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /sessions/livingmenu:
+    post:
+      tags:
+      - Sessions
+      summary: CreateLMSession
+      description: >-
+        Pay money to book the session.
+
+
+        ---
+
+        ## Role
+
+        - `any`
+
+        ---
+
+        ## FlOW
+
+        1. **check**:
+           * check_user_exists() → the user must exist in tempuser collection.
+             * error → 404, 400, NotFound
+           * check_session_open → session must be at `open` status.
+             * error → 403, 312, SessionStatusError
+           * check_pax_not_over_limit → booked number + pax must not over the session limit.
+             * error → 402, 300, RequestFailed
+        2. **doAction**:
+           * discount() → have `fee` discount(500) if `ReferralCode` provided and valid
+           * charge() → charge user by credit card info
+             * error → 403, 301, StripeOperateError
+           * close → update session status to `close` if reaches the station/people limit
+           * create_booking() → create a document in Booking collection, having status `booked` as default
+        ---
+
+        Jira Link: [CE2-12](https://livingmenu.atlassian.net/browse/CE2-12)
+      operationId: CreateLMSession
+      parameters:
+      - name: Content-Type
+        in: header
+        description: ''
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/Content-Type'
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLMSessionRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSessionResponse'
+        400:
+          description: '\[100, 101, 102, 103] BadRequest'
+        401:
+          description: '\[200] Unauthorized'
+        403:
+          description: "\\[300] Your role doesn't have such operation permission"
+        404:
+          description: '\[400] NotFound'
+        429:
+          description: Too Many Requests
+        500:
+          description: '\[500, 501, 502, 502] ServerErrors'
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /sessions:
+    get:
+      tags:
+      - Sessions
+      summary: GetRQSessions
+      description: "Get all requested sessions.  \n\n---\n## Role\n- `any`\n---\n## Flow\n1. **check**:\n   * no\n2. **doAction**:\n   * get_sessions() → retrieve all documents in *Session* collection join *Client* and *Location* filtered by conditions given from request\n---\nJira Link: [CE2-60](https://livingmenu.atlassian.net/browse/CE2-60)"
+      operationId: GetRQSessions
+      parameters:
+      - name: SessionType
+        in: query
+        description: 'i.e.: LM, RQ'
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: Status
+        in: query
+        description: 'i.e.: new, progress, solved, finished'
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: ClientId
+        in: query
+        description: ''
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: LocationId
+        in: query
+        description: ''
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: StartTime
+        in: query
+        description: ''
+        style: form
+        explode: true
+        schema:
+          type: number
+          format: unix-timestamp
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetRQSessionResponse'
+                description: ''
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /sessions/{SessionId}:
+    patch:
+      tags:
+      - Sessions
+      summary: UpdateSession
+      description: "Update the existing session \n\n---\n## Role\n- [`admin`]\n---\n## Unique Key\n- \\[`StartTime`,`LocationId`]\n---\n## Foreign Key\n- \\[`OwnerId`,`LocationId`,`PromotionId`,`Tag`]\n---\n## FLOW\n1. **check**:\n   * check_padding_time() → StartTime and EndTime cannot be 1 hour shorter than existing open sessions\n   * check_limit() → *Limit* can't smaller than *BookedNumber*\n   * check_Pax() → *Pax* can't smaller than existing Booking Pax number\n   * check_Fee() → if there is no one booked\n   * check_Owner() → if there is no one booked\n   * check_SessionType() → if there is no one booked\n   * check_Location() → if there is no one booked\n   * check_Promotion() → if there is no one booked\n   \n2. **doAction**:\n   * update_session() → update the document in *Session* collection\n   * save_tag() → save all the tags as id into *Tag* collection\n---\nJira Link: [CE2-18](https://livingmenu.atlassian.net/browse/CE2-18)"
+      operationId: UpdateSession
+      parameters:
+      - name: SessionId
+        in: path
+        description: ''
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSessionRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users/hosts:
+    post:
+      tags:
+      - Users
+      summary: CreateHost
+      description: >-
+        Create a host as new user
+
+
+        ---
+
+        ## Role
+
+        - `admin`
+
+        ---
+
+        ## FlOW
+
+        1. **check**:
+           * no
+        2. **doAction**:
+           * create_host() → create a document in *Host* collection.
+           * update_user() → set *Role* `host`, and link *HostId* in *User* collection.
+        ---
+
+        Jira Link: [CE2-44](https://livingmenu.atlassian.net/browse/CE2-44)
+      operationId: CreateHost
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHostRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateHostResponse'
+              example:
+                HostId: JiiqvMCUGetv9H0LDu53
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /locations:
+    get:
+      tags:
+      - Locations
+      summary: GetLocations
+      description: "Get locations.  \n\n---\n## Role\n- `any`\n---\n## Flow\n1. **check**:\n   * no\n2. **doAction**:\n   * get_locations() → retrieve all documents in *Location* collection, in each document, form the `Address` by format as below, i.e.: 1 Harbourfront Walk, #05-53, Singapore 098585\n```sh\n`${RoadNumber} ${RoadName}, ${BuildingNumber}, #${FloorNumber}-${UnitNumber}, ${Country} ${Postcode}`\n```\n---\nJira Link: [CE2-47](https://livingmenu.atlassian.net/browse/CE2-47)"
+      operationId: GetLocations
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetLocationResponse'
+                description: ''
+              example:
+              - LocationId: D3VFHZb38LWypEN9g7Gz
+                Address: 1 Harbourfront Walk, Singapore 098585
+                Postcode: 098585
+                Country: Singapore
+                BuildingNumber: 17
+                FloorNumber: 6
+                UnitNumber: 41
+                RoadNumber: 1
+                RoadName: Harbourfront Walk
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    post:
+      tags:
+      - Locations
+      summary: CreateLocation
+      description: CreateLocation
+      operationId: CreateLocation
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLocationRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /sessions/requested:
+    post:
+      tags:
+      - Sessions
+      summary: CreateRQSession
+      description: >-
+        Session is requested from client .
+
+
+        ---
+
+        ## Role
+
+        - `admin`
+
+        ---
+
+        ## Flow
+
+        1. **check**:
+           no
+        2. **doAction**:
+           * create_session() → create a document in *Session* collection, having increment *SessionNo*, *SessionType* `RQ` and *Status* `new` as default.
+        ---
+
+        Jira Link: [CE2-73](https://livingmenu.atlassian.net/browse/CE2-73)
+      operationId: CreateRQSession
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRQSessionRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /dishes:
+    post:
+      tags:
+      - Dishes
+      summary: CreateDish
+      description: CreateDish
+      operationId: CreateDish
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDishRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    get:
+      tags:
+      - Dishes
+      summary: GetDishes
+      description: GetDishes
+      operationId: GetDishes
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetDishResponse'
+                description: ''
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users/chefs:
+    post:
+      tags:
+      - Users
+      summary: CreateChef
+      description: >-
+        Create a chef as new user
+
+
+        ---
+
+        ## Role
+
+        - `admin`
+
+        ---
+
+        ## FlOW
+
+        1. **check**:
+           * no
+        2. **doAction**:
+           * create_chef() → create a document and link *UserId* in *Chef* collection.
+           * update_user() → set *Role* `chef`.
+        ---
+
+        Jira Link: [CE2-43](https://livingmenu.atlassian.net/browse/CE2-43)
+      operationId: CreateChef
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChefRequest'
+        required: false
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChefResponse'
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users/contacts:
+    post:
+      tags:
+      - Users
+      summary: CreateContact
+      description: "Create a new contact \n\n---\n## Role\n- `admin`\n---\n## Flow\n1. **check**:\n   * no\n2. **doAction**:\n   * create_contact() → create a document in *User* collection, set *Role* `contact`, *Activate* `false` as default.\n---\nJira Link: [CE2-85](https://livingmenu.atlassian.net/browse/CE2-85)"
+      operationId: CreateContact
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactRequest'
+        required: false
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateContactResponse'
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    get:
+      tags:
+      - Users
+      summary: GetContacts
+      description: "Get all contacts.  \n\n---\n## Role\n- `any`\n---\n## Flow\n1. **check**:\n   * no\n2. **doAction**:\n   * get_contacts() → retrieve all documents in *User* collection, where *Role* = `contact`, form the FullName by `${FirstName} ${SurName}`\n---\nJira Link: [CE2-86](https://livingmenu.atlassian.net/browse/CE2-86)"
+      operationId: GetContacts
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetContactResponse'
+                description: ''
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /hosts:
+    get:
+      tags:
+      - Hosts
+      summary: GetHosts
+      description: GetHosts
+      operationId: GetHosts
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /service_types:
+    post:
+      tags:
+      - ServiceTypes
+      summary: CreateServiceTypes
+      description: Create service type.
+      operationId: CreateServiceTypes
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServiceTypeRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    get:
+      tags:
+      - ServiceTypes
+      summary: GetServiceTypes
+      description: "Get service type.  \n\n---\n## Role\n- `any`\n---\n## Flow\n1. **check**:\n   * no\n2. **doAction**:\n   * get_service_type() → retrieve all documents in *ServiceType* collection\n---\nJira Link: [CE2-96](https://livingmenu.atlassian.net/browse/CE2-96)"
+      operationId: GetServiceTypes
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetServiceTypeResponse'
+                description: ''
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /chefs:
+    get:
+      tags:
+      - Chefs
+      summary: GetChefs
+      description: "Get all chefs.  \n\n---\n## Role\n- `any`\n---\n## FLOW\n1. **check**:\n   * no\n2. **doAction**:\n   * get_chefs() → retrieve all document in *Chef* collection\n---\nJira Link: [CE2-49](https://livingmenu.atlassian.net/browse/CE2-49)"
+      operationId: GetChefs
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetChefsResponse'
+                description: ''
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users/admins:
+    post:
+      tags:
+      - Users
+      summary: CreateAdmin
+      description: CreateAdmin
+      operationId: CreateAdmin
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetChefsResponse'
+                description: ''
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /payment:
+    post:
+      tags:
+      - PaymentTypes
+      summary: CreatePaymentTypes
+      description: CreatePaymentTypes
+      operationId: CreatePaymentTypes
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentTypeRequest'
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    get:
+      tags:
+      - PaymentTypes
+      summary: GetPaymentTypes
+      description: GetPaymentTypes
+      operationId: GetPaymentTypes
+      parameters: []
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetPaymentTypeResponse'
+                description: ''
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+components:
+  schemas:
+    GetUsersResponse:
+      title: GetUsersResponse
+      required:
+      - UserId
+      - Email
+      - Name
+      - Phone
+      - ReferralCode
+      type: object
+      properties:
+        UserId:
+          type: string
+        Email:
+          type: string
+        Name:
+          type: string
+        Phone:
+          type: string
+        ReferralCode:
+          type: string
+    PaymentMethod:
+      title: PaymentMethod
+      enum:
+      - cash
+      - online
+      - cheque
+      type: string
+      example: cash
+      x-enum-elements:
+      - name: cash
+        description: ''
+      - name: online
+        description: ''
+      - name: cheque
+        description: ''
+    PaymentStatus:
+      title: PaymentStatus
+      enum:
+      - paid
+      - unpaid
+      - deposit
+      type: string
+      example: paid
+      x-enum-elements:
+      - name: paid
+        description: paid
+      - name: unpaid
+        description: unpaid
+      - name: deposit
+        description: deposit
+    GetServiceTypeResponse:
+      title: GetServiceTypeResponse
+      required:
+      - ServiceTypeId
+      - SessionType
+      - Name
+      type: object
+      properties:
+        ServiceTypeId:
+          type: string
+        SessionType:
+          type: string
+        Name:
+          type: string
+    CreateLocationRequest:
+      title: CreateLocationRequest
+      required:
+      - Postcode
+      - RoadNumber
+      - RoadName
+      - Country
+      type: object
+      properties:
+        Postcode:
+          type: string
+        BuildingNumber:
+          type: string
+          description: building number
+          example: 17
+        FloorNumber:
+          type: string
+        UnitNumber:
+          type: string
+        RoadNumber:
+          type: string
+        RoadName:
+          type: string
+        Country:
+          type: string
+          example: Singapore
+      example:
+        Postcode: 098585
+        Country: Singapore
+        BuildingNumber: 17
+        FloorNumber: 6
+        UnitNumber: 41
+        RoadNumber: 1
+        RoadName: Harbourfront Walk
+    GetSessionsResponse:
+      title: GetSessionsResponse
+      required:
+      - SessionId
+      - StartTime
+      - EndTime
+      - Limit
+      - BookedNumber
+      - Fee
+      - Status
+      - OwnerId
+      - SessionType
+      type: object
+      properties:
+        SessionId:
+          type: string
+          description: Id of the session
+          example: i0C2vfPhMe6xCgGWWA5F
+        StartTime:
+          type: number
+          description: session start time
+          format: unix-timestamp
+          example: 1539792000
+        EndTime:
+          type: number
+          description: session end time
+          format: unix-timestamp
+          example: 1540483200
+        Limit:
+          type: integer
+          description: the limit of how many people can book this session
+          format: int32
+          example: 5
+        BookedNumber:
+          type: integer
+          description: the number of people who have already booked this session
+          format: int32
+          example: 3
+        Fee:
+          type: integer
+          description: the session fee
+          format: int32
+          example: 2900
+        Status:
+          type: string
+          description: "i.e.: 'open', 'close'"
+          example: open
+        OwnerId:
+          type: string
+          description: the owner of this session. he could be the chef or host
+          example: D3VFHZb38LWypEN9g7Gz
+        SessionType:
+          type: string
+          description: 'i.e.: "Payment", "Demo"'
+          example: Payment
+      description: response of getting sessions
+      example:
+        SessionId: JiiqvMCUGetv9H0LDu53
+        StartTime: 1539792000
+        EndTime: 1540483200
+        Limit: 5
+        BookedNumber: 3
+        Fee: 2900
+        OwnerId: (CC/Host)
+        SessionType: Gen/Com
+        Status: open
+    CreateBookingRequest:
+      title: CreateBookingRequest
+      required:
+      - SessionId
+      - UserId
+      - HolderName
+      - CardNumber
+      - ExpMonth
+      - ExpYear
+      - CVC
+      - Pax
+      - PromotionId
+      type: object
+      properties:
+        SessionId:
+          type: string
+          description: Session Id that user wants to book.
+          example: FQaavcl32v3pZojgUYGG
+        UserId:
+          type: string
+          description: auth user or temp user id
+          example: D3VFHZb38LWypEN9g7Gz
+        HolderName:
+          type: string
+          description: credit card holder name
+          example: Johny Lee
+        CardNumber:
+          type: string
+          description: credit card number
+          example: 4242424242424242
+        ExpMonth:
+          type: string
+          description: expire month
+          example: 12
+        ExpYear:
+          type: string
+          description: expire year
+          example: 2019
+        CVC:
+          type: string
+          description: cvc code
+          example: 123
+        ReferralCode:
+          type: string
+          description: the code to get discount
+          example: jh32kd
+        Pax:
+          type: integer
+          description: number of participant user can book in 1 booking
+          format: int32
+          example: 1
+        PromotionId:
+          type: string
+          description: id of promotion campaign
+    CreateHostRequest:
+      title: CreateHostRequest
+      required:
+      - CuisineType
+      - SessionType
+      - Review
+      - Photo
+      - Video
+      - Story
+      - Skill
+      type: object
+      properties:
+        CuisineType:
+          type: string
+        SessionType:
+          $ref: '#/components/schemas/SessionType'
+        Review:
+          type: string
+        Photo:
+          type: string
+        Video:
+          type: string
+        Story:
+          type: string
+        Skill:
+          type: integer
+          format: int32
+    GetChefsResponse:
+      title: GetChefsResponse
+      required:
+      - ChefId
+      - CuisineType
+      - SessionType
+      - Review
+      - Story
+      - Media
+      - Skill
+      - DishHistory
+      - DishPhoto
+      type: object
+      properties:
+        ChefId:
+          type: string
+        CuisineType:
+          type: string
+        SessionType:
+          $ref: '#/components/schemas/SessionType'
+        Review:
+          type: string
+        Story:
+          type: string
+        Media:
+          type: string
+        Skill:
+          type: integer
+          format: int32
+        DishHistory:
+          type: string
+        DishPhoto:
+          type: string
+          description: the link of dish photo storage
+      description: response of getting chefs
+    CreateChefRequest:
+      title: CreateChefRequest
+      required:
+      - CuisineType
+      - SessionType
+      - Review
+      - Photo
+      - Video
+      - Story
+      - Skill
+      - DishHistory
+      - DishPhoto
+      - UserId
+      type: object
+      properties:
+        CuisineType:
+          type: string
+        SessionType:
+          $ref: '#/components/schemas/SessionType'
+        Review:
+          type: string
+        Photo:
+          type: string
+        Video:
+          type: string
+        Story:
+          type: string
+        Skill:
+          type: string
+        DishHistory:
+          type: string
+        DishPhoto:
+          type: string
+        UserId:
+          type: string
+    GetCompanyResponse:
+      title: GetCompanyResponse
+      required:
+      - CompanyId
+      - Name
+      - BillingAddress
+      - BillingPostcode
+      - BillingCountry
+      - BillingRoadNumber
+      - BillingRoadName
+      type: object
+      properties:
+        CompanyId:
+          type: string
+          example: D3VFHZb38LWypEN9g7Gz
+        Name:
+          type: string
+          example: Jusco
+        BillingAddress:
+          type: string
+          example: Justco UIC - 06 Sheraton Way, Singapore 169138
+        BillingPostcode:
+          type: string
+          example: 169138
+        BillingCountry:
+          type: string
+          example: Singapore
+        BillingBuildingNumber:
+          type: string
+        BillingFloorNumber:
+          type: string
+        BillingUnitNumber:
+          type: string
+        BillingRoadNumber:
+          type: string
+        BillingRoadName:
+          type: string
+      description: response of company module
+    GetLocationResponse:
+      title: GetLocationResponse
+      required:
+      - LocationId
+      - Address
+      - Postcode
+      - RoadNumber
+      - RoadName
+      - Country
+      type: object
+      properties:
+        LocationId:
+          type: string
+          example: D3VFHZb38LWypEN9g7Gz
+        Address:
+          type: string
+          example: 06 Sheraton Way, Singapore 169138
+        Postcode:
+          type: string
+          example: 169138
+        BuildingNumber:
+          type: string
+          example: 17
+        FloorNumber:
+          type: string
+          example: 6
+        UnitNumber:
+          type: string
+          example: 41
+        RoadNumber:
+          type: string
+          example: 1
+        RoadName:
+          type: string
+          example: Harbourfront Walk
+        Country:
+          type: string
+      example:
+        LocationId: D3VFHZb38LWypEN9g7Gz
+        Address: 1 Harbourfront Walk, Singapore 098585
+        Postcode: 098585
+        Country: Singapore
+        BuildingNumber: 17
+        FloorNumber: 6
+        UnitNumber: 41
+        RoadNumber: 1
+        RoadName: Harbourfront Walk
+    CreateCompanyRequest:
+      title: CreateCompanyRequest
+      required:
+      - Name
+      - BillingPostcode
+      - BillingCountry
+      - BillingRoadNumber
+      - BillingRoadName
+      type: object
+      properties:
+        Name:
+          type: string
+        BillingPostcode:
+          type: string
+          example: 169371
+        BillingCountry:
+          type: string
+          example: Singapore
+        BillingBuidlingNumber:
+          type: string
+        BillingFloorNumber:
+          type: string
+        BillingUnitNumber:
+          type: string
+        BillingRoadNumber:
+          type: string
+        BillingRoadName:
+          type: string
+    GetContactResponse:
+      title: GetContactResponse
+      required:
+      - UserId
+      - FirstName
+      - Phone
+      - Surname
+      - FullName
+      - Phone2
+      type: object
+      properties:
+        UserId:
+          type: string
+          example: D3VFHZb38LWypEN9g7Gz
+        FirstName:
+          type: string
+          example: Michelle
+        Phone:
+          type: string
+          example: +65 7293 0285
+        Surname:
+          type: string
+        FullName:
+          type: string
+          example: Andy Liu
+        Phone2:
+          type: string
+    CreateContactRequest:
+      title: CreateContactRequest
+      required:
+      - Email
+      - FirstName
+      - Phone
+      - Surname
+      type: object
+      properties:
+        Email:
+          type: string
+        FirstName:
+          type: string
+        Phone:
+          type: string
+        Surname:
+          type: string
+        Phone2:
+          type: string
+      description: Create Contact Resquest
+      example:
+        Email: it@living.menu
+        FirstName: Andy
+        Surname: Liu
+        Phone: 6512345678
+    UpdateSessionRequest:
+      title: UpdateSessionRequest
+      type: object
+      properties:
+        Title:
+          type: string
+          description: title of the session
+        StartTime:
+          type: number
+          format: unix-timestamp
+          example: 1539792000
+        EndTime:
+          type: number
+          format: unix-timestamp
+        Limit:
+          type: integer
+          format: int32
+        Fee:
+          type: integer
+          format: int32
+        OwnerId:
+          type: string
+        SessionType:
+          $ref: '#/components/schemas/SessionType'
+        Story:
+          type: string
+        Media:
+          type: string
+        LocationId:
+          type: string
+        Pax:
+          type: integer
+          format: int32
+        PromotionId:
+          type: string
+        Tag:
+          type: string
+    CreateLMSessionRequest:
+      title: CreateLMSessionRequest
+      required:
+      - Title
+      - StartTime
+      - EndTime
+      - Limit
+      - Fee
+      - OwnerId
+      - SessionType
+      - Story
+      - Media
+      - LocationId
+      - Pax
+      type: object
+      properties:
+        Title:
+          type: string
+          description: title of the session
+        StartTime:
+          type: number
+          format: unix-timestamp
+          example: 1539792000
+        EndTime:
+          type: number
+          format: unix-timestamp
+          example: 1540483200
+        Limit:
+          type: integer
+          description: the limit of how many participant can book this session
+          format: int32
+          example: 5
+        Fee:
+          type: integer
+          description: the session fee, note if 29 sgd, pls input 2900
+          format: int32
+        OwnerId:
+          type: string
+          description: the owner of this session. he could be the chef or host
+        SessionType:
+          $ref: '#/components/schemas/SessionType'
+        Story:
+          type: string
+          description: session's story
+        Media:
+          type: string
+          description: photo or video
+        LocationId:
+          type: string
+          description: the reference of the location collection
+        Pax:
+          type: integer
+          description: pax per user can book in 1 booking
+          format: int32
+          example: 20
+        PromotionId:
+          type: string
+          description: id of promotion campaign
+        Tag:
+          type: array
+          items:
+            type: string
+          description: self define label
+    GetRQSessionResponse:
+      title: GetRQSessionResponse
+      required:
+      - SessionId
+      - SessionNumber
+      - SessionType
+      - StartTime
+      - EndTime
+      - Status
+      - BudgetLow
+      - CompanyId
+      - CompanyName
+      - LocationId
+      - LocationAddress
+      - ServiceTypeId
+      - BudgetHigh
+      type: object
+      properties:
+        SessionId:
+          type: string
+        SessionNumber:
+          type: string
+        SessionType:
+          type: string
+        StartTime:
+          type: number
+          format: unix-timestamp
+        EndTime:
+          type: number
+          format: unix-timestamp
+        Status:
+          type: string
+        BudgetLow:
+          type: number
+          example: 2140.5500000000002
+        CompanyId:
+          type: string
+        CompanyName:
+          type: string
+        LocationId:
+          type: string
+        LocationAddress:
+          type: string
+        ServiceTypeId:
+          type: string
+        BudgetHigh:
+          type: number
+      example:
+        Id: JiiqvMCUGetv9H0LDu53
+        No: 0001
+        Type: RQ
+        StartTime: 1480809600
+        EndTime: 1480809600
+        Status: new
+        BudgetLow: 2140.5500000000002
+        BudgetHigh: 2155.6500000000001
+        CompanyId: JiiqvMCUGetv9H0LDu53
+        CompanyName: Justco
+        LocationId: JiiqvMCUGetv9H0LDu53
+        LocationAddress: 06 Sheraton Road, 165192 Sinapore
+        ServiceTypeId: JiiqvMCUGetv9H0LDu53
+    CreateRQSessionRequest:
+      title: CreateRQSessionRequest
+      required:
+      - StartTime
+      - Objective
+      - Capacity
+      - BudgetLow
+      - BudgetHigh
+      - PaymentMethod
+      - LocationId
+      - ContactId
+      - ServiceTypeId
+      - MainDishNo
+      - MenuType
+      - HandsOn
+      type: object
+      properties:
+        StartTime:
+          type: number
+          format: unix-timestamp
+          example: 1480809600
+        EndTime:
+          type: number
+          format: unix-timestamp
+          example: 1480809600
+        Objective:
+          type: string
+          example: Have a fun & engaging dinner for a group of 80 people
+        Capacity:
+          type: integer
+          format: int32
+          example: 5
+        BudgetLow:
+          type: number
+          example: 2140.5500000000002
+        BudgetHigh:
+          type: integer
+          format: int32
+        PaymentIds:
+          type: array
+          items:
+            type: string
+          description: ''
+        Addition:
+          type: string
+          example: Client's space doesn't have any oven or bla bla, need to provide ourselves bla bla
+        PaymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        CompanyId:
+          type: string
+          example: cli_JiiqvMCUGetv9H0LD
+        LocationId:
+          type: string
+          example: loc_JiiqvMCUGetv9H0LD
+        ContactId:
+          type: string
+          example: con_JiiqvMCUGetv9H0LD
+        DietaryRestriction:
+          type: string
+        ServiceTypeId:
+          type: string
+        MainDishNo:
+          type: integer
+          format: int32
+        MenuType:
+          type: string
+        HandsOn:
+          type: string
+    CreatePaymentRequest:
+      title: CreatePaymentRequest
+      required:
+      - Name
+      type: object
+      properties:
+        Name:
+          type: string
+          example: asian
+    CreatePaymentTypeRequest:
+      title: CreatePaymentTypeRequest
+      required:
+      - Receiver
+      - Amount
+      type: object
+      properties:
+        Receiver:
+          type: string
+        Amount:
+          type: integer
+          format: int32
+    CreateSessionResponse:
+      title: CreateSessionResponse
+      required:
+      - SessionId
+      type: object
+      properties:
+        SessionId:
+          type: string
+          description: Id of session
+          example: KXNvvUouDI0eFLQEkKju
+      description: response of creating a session
+    CreateHostResponse:
+      title: CreateHostResponse
+      required:
+      - HostId
+      type: object
+      properties:
+        HostId:
+          type: string
+      example:
+        HostId: JiiqvMCUGetv9H0LDu53
+    CreateDishRequest:
+      title: CreateDishRequest
+      required:
+      - Name
+      type: object
+      properties:
+        Name:
+          type: string
+    CreateContactResponse:
+      title: CreateContactResponse
+      required:
+      - UserId
+      type: object
+      properties:
+        UserId:
+          type: string
+          description: Id of user
+          example: '"D3VFHZb38LWypEN9g7Gz"'
+      description: response of creating a contact
+      example:
+        UserId: D3VFHZb38LWypEN9g7Gz
+    CreateBookingResponse:
+      title: CreateBookingResponse
+      required:
+      - BookingId
+      type: object
+      properties:
+        BookingId:
+          type: string
+          description: id of the booking
+          example: 7TkC8U6cIr7n7doz3TqE
+      description: response of booking the session
+      example:
+        BookingId: 7TkC8U6cIr7n7doz3TqE
+    GetDishResponse:
+      title: GetDishResponse
+      required:
+      - DishId
+      type: object
+      properties:
+        DishId:
+          type: string
+    Content-Type:
+      title: Content-Type
+      enum:
+      - application/json
+      type: string
+      example: application/json
+      x-enum-elements:
+      - name: Enum_applicationjson
+        description: ''
+    CreateChefResponse:
+      title: CreateChefResponse
+      required:
+      - ChefId
+      type: object
+      properties:
+        ChefId:
+          type: string
+      example:
+        ChefId: JiiqvMCUGetv9H0LDu53
+    SessionType:
+      title: SessionType
+      enum:
+      - LM
+      - RQ
+      type: string
+      description: SessionType
+      example: LM
+      x-enum-elements:
+      - name: LM
+        description: livingmenu
+      - name: RQ
+        description: requested
+    CreateServiceTypeRequest:
+      title: CreateServiceTypeRequest
+      required:
+      - SessionType
+      - Name
+      type: object
+      properties:
+        SessionType:
+          $ref: '#/components/schemas/SessionType'
+        Name:
+          type: string
+          example: private_dining
+    GetPaymentTypeResponse:
+      title: GetPaymentTypeResponse
+      required:
+      - PaymentId
+      - Receiver
+      - Amount
+      type: object
+      properties:
+        PaymentId:
+          type: string
+        Receiver:
+          type: string
+          example: asian
+        Amount:
+          type: number
+tags: []

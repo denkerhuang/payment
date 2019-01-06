@@ -1,0 +1,75 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//---- [Swagger parse]----
+exports.YamlFile = 'CE_2.0.yaml';
+exports.SwaggerRequest = 'request';
+exports.SwaggerResponse = 'response';
+//---- [Firestore Code]----
+exports.Collection_User = 'User';
+exports.Collection_Session = 'Session';
+exports.Collection_Record = "Record";
+exports.Collection_Payment = "Payment";
+//---- [Status]----
+exports.BookingStatus_Preview = 'preview';
+exports.BookingStatus_Booked = 'booked';
+exports.BookingStatus_Checkin = 'check-in';
+exports.BookingStatus_Cancelled = 'cancelled';
+exports.BookingStatus_Collected = 'ingredients-collected';
+exports.BookingStatus_Receipt = 'receipt-confirmed';
+exports.BookingStatus_Serving = 'serving';
+exports.BookingStatus_Pause = 'pause';
+exports.BookingStatus_Finish = 'finish';
+exports.ZoneSessionStatus_Close = 'close';
+// export const DishStatus_Completed = 'completed'
+exports.OrderStatus_Preview = 'preview';
+exports.OrderStatus_Placed = 'placed';
+// export const OrderStatus_Ready = 'ready'
+exports.OrderStatus_Completed = 'completed';
+exports.MissionStatus_Init = 'init';
+exports.MissionStatus_Ready = 'ready-deliver';
+exports.MissionStatus_Completed = 'completed';
+exports.SessionStatus_New = 'new';
+exports.SessionStatus_Open = 'open';
+exports.SessionStatus_Close = 'close';
+exports.SessionType_RQ = 'RQ';
+exports.SessionType_LM = 'LM';
+exports.BookingType_CE = 'CE';
+exports.BookingType_CK = 'CK';
+exports.Role_Admin = 'admin';
+exports.Role_Terminal = 'terminal';
+exports.Role_Foodie = 'foodie';
+exports.Role_Chef = 'chef';
+exports.Role_Consumer = 'consumer';
+exports.Role_Driver = 'driver';
+exports.Role_Contact = 'contact';
+exports.Datatype_String = 'string';
+exports.Datatype_Number = 'number';
+exports.Datatype_Integer = 'integer';
+exports.Datatype_Boolean = 'boolean';
+exports.Datatype_Array = 'array';
+exports.DataTypePromise = 'Promise';
+//---- [Http Status & Error Code]----
+exports.HttpOK = '200';
+exports.BadRequest = '400';
+exports.Forbidden = '403';
+exports.TooManyRequests = '429';
+exports.ServerError = '500';
+exports.MalformatJSON = '100';
+exports.MissRequired = '101';
+exports.DataTypeError = '102';
+exports.Unauthorized = '200';
+exports.RequestFailed = '300';
+exports.FirestoreError = '301';
+exports.StripeError = '302';
+exports.SwaggerError = '303';
+exports.BookingStatusError = '310';
+exports.OrderStatusError = '311';
+exports.SessionStatusError = '312';
+exports.StationStatusError = '313';
+exports.NoRolePermission = '400';
+exports.NotFound = '404';
+exports.DataExist = '600';
+exports.DataRuleConflict = '601';
+exports.UKConflict = '602';
+// export const ServerError = '500'
+//# sourceMappingURL=Constant.js.map
